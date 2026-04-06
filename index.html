@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Arroz - Vibras Positivas HM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #1565c0;
+            --accent: #fbc02d;
+            --light: #f4f4f9;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--light); padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+
+        .upload-section {
+            border: 2px dashed var(--primary);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background: #f1f8e9;
+        }
+
+        .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        
+        button { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; }
+        .btn-upload { background: var(--primary); }
+        .btn-report { background: var(--secondary); }
+        .btn-wa { background: #25d366; }
+
+        .stats-panel {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            background: #fff9c4;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+        th { background: var(--primary); color: white; padding: 12px; }
+        td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        tr:nth-child(even) { background: #f9f9f9; }
+
+        .footer { margin-top: 40px; text-align: center; font-size: 0.85em; color: #555; border-top: 1px solid #eee; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Vibras Positivas HM - Control de Arroz</h1>
+
+    <div class="upload-section">
+        <p>Seleccione el archivo Excel (.xlsx) con las columnas: <strong>Mes, Producto, Cantidad, Ciudad, Peso, Vendedor</strong></p>
+        <input type="file" id="excelInput" accept=".xlsx, .xls" />
+    </div>
+
+    <div class="actions">
+        <button class="btn-report" onclick="generarInforme()">📊 Generar Informes</button>
+        <button class="btn-wa" onclick="enviarWhatsApp()">📱 Enviar a Gerencia</button>
+    </div>
+
+    <div id="informe" class="stats-panel">
+        <div><strong>🏆 Top Vendedor (Kilos):</strong> <br><span id="topVendedor">-</span></div>
+        <div><strong>🌾 Más Vendido por Producto:</strong> <br><span id="topProd">-</span></div>
+        <div><strong>📍 Ciudad con más Compras:</strong> <br><span id="topCiudad">-</span></div>
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table id="tablaVentas">
+            <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Ciudad</th>
+                    <th>Peso Unit.</th>
+                    <th>Total Kilos</th>
+                    <th>Vendedor</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>App desarrollada por <strong>Vibras Positivas HM</strong> &copy; 2026<br>
+        Derechos de Autor - Contacto: 3117700431</p>
+    </div>
+</div>
+
+<script>
+    let ventas = [];
+
+    // Leer el archivo Excel
+    document.getElementById('excelInput').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            
+            // Convertir a JSON (asumiendo fila 1 con encabezados)
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            procesarDatosExcel(jsonData);
+        };
+        reader.readAsArrayBuffer(e.target.files[0]);
+    });
+
+    function procesarDatosExcel(datos) {
+        ventas = datos.map(fila => {
+            // Normalizar nombres de columnas por si vienen en mayúsculas o minúsculas
+            const cant = parseFloat(fila.Cantidad || fila.CANTIDAD || 0);
+            const peso = parseFloat(fila.Peso || fila.PESO || 0);
+            return {
+                mes: fila.Mes || fila.MES || "",
+                producto: fila.Producto || fila.PRODUCTO || fila['Nombre del Producto'] || "",
+                cantidad: cant,
+                ciudad: fila.Ciudad || fila.CIUDAD || "",
+                peso: peso,
+                kilos: cant * peso,
+                vendedor: fila.Vendedor || fila.VENDEDOR || ""
+            };
+        });
+        renderizarTabla();
+    }
+
+    function renderizarTabla() {
+        const tbody = document.querySelector("#tablaVentas tbody");
+        tbody.innerHTML = "";
+        ventas.forEach((v, index) => {
+            tbody.innerHTML += `<tr>
+                <td>${v.mes}</td>
+                <td>${v.producto}</td>
+                <td>${v.cantidad}</td>
+                <td>${v.ciudad}</td>
+                <td>${v.peso}</td>
+                <td>${v.kilos.toFixed(2)}</td>
+                <td>${v.vendedor}</td>
+                <td><button onclick="borrarRegistro(${index})" style="background:#d32f2f; padding:5px 10px;">Eliminar</button></td>
+            </tr>`;
+        });
+    }
+
+    function generarInforme() {
+        if(ventas.length === 0) return alert("Primero sube un archivo Excel");
+
+        const xVendedor = {}, xProducto = {}, xCiudad = {};
+
+        ventas.forEach(v => {
+            xVendedor[v.vendedor] = (xVendedor[v.vendedor] || 0) + v.kilos;
+            xCiudad[v.ciudad] = (xCiudad[v.ciudad] || 0) + v.kilos;
+            // Para producto (unimos nombre y vendedor para ver el que más vende ese producto)
+            const prodKey = `${v.producto} (${v.vendedor})`;
+            xProducto[prodKey] = (xProducto[prodKey] || 0) + v.kilos;
+        });
+
+        const mejorV = Object.keys(xVendedor).reduce((a, b) => xVendedor[a] > xVendedor[b] ? a : b);
+        const mejorP = Object.keys(xProducto).reduce((a, b) => xProducto[a] > xProducto[b] ? a : b);
+        const mejorC = Object.keys(xCiudad).reduce((a, b) => xCiudad[a] > xCiudad[b] ? a : b);
+
+        document.getElementById('informe').style.display = 'grid';
+        document.getElementById('topVendedor').innerText = `${mejorV} (${xVendedor[mejorV].toFixed(2)} Kg)`;
+        document.getElementById('topProd').innerText = mejorP;
+        document.getElementById('topCiudad').innerText = mejorC;
+    }
+
+    function enviarWhatsApp() {
+        if(ventas.length === 0) return;
+        const totalKg = ventas.reduce((acc, v) => acc + v.kilos, 0);
+        const texto = `Resumen de Ventas - Vibras Positivas HM:\nTotal Registros: ${ventas.length}\nTotal Kilos: ${totalKg.toFixed(2)} Kg.\nTop Vendedor: ${document.getElementById('topVendedor').innerText}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    function borrarRegistro(index) {
+        ventas.splice(index, 1);
+        renderizarTabla();
+    }
+</script>
+
+</body>
+</html>
