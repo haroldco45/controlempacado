@@ -2,45 +2,45 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Vibras Positivas HM - Control de Arroz</title>
+    <title>VIBRAS POSITIVAS HM - CONTROL TOTAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --verde: #1b5e20; --azul: #0d47a1; --fondo: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--fondo); padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: var(--verde); border-bottom: 4px solid var(--verde); padding-bottom: 10px; text-transform: uppercase; }
-        .upload-box { background: #e8f5e9; border: 3px dashed var(--verde); padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 20px; }
-        .btn-group { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
-        button { padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; font-size: 16px; transition: 0.3s; }
-        .btn-inf { background: var(--azul); }
+        :root { --v: #1b5e20; --a: #0d47a1; --f: #f0f2f5; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--f); margin: 0; padding: 20px; }
+        .card { max-width: 1100px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--v); border-bottom: 3px solid var(--v); padding-bottom: 10px; margin: 0 0 20px 0; }
+        .drop-zone { background: #e8f5e9; border: 3px dashed var(--v); padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 20px; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.3s; }
+        .btn-inf { background: var(--a); }
         .btn-wa { background: #25d366; }
-        .resumen-panel { display: none; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; background: #fff9c4; padding: 20px; border-radius: 10px; border-left: 8px solid #fbc02d; margin-bottom: 25px; font-size: 16px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th { background: var(--verde); color: white; padding: 12px; font-size: 13px; text-align: center; }
-        td { padding: 10px; border: 1px solid #eee; text-align: center; font-size: 13px; }
+        .info-panel { display: none; background: #fff9c4; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 6px solid #fbc02d; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th { background: var(--v); color: #fff; padding: 12px; border: 1px solid #ddd; }
+        td { padding: 10px; border: 1px solid #ddd; text-align: center; }
         tr:nth-child(even) { background: #f9f9f9; }
-        .footer { text-align: center; margin-top: 40px; color: #777; font-size: 12px; border-top: 1px solid #ddd; padding-top: 15px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="card">
     <h1>VIBRAS POSITIVAS HM</h1>
     
-    <div class="upload-box" onclick="document.getElementById('excelInput').click()">
-        <strong>📁 CLIC AQUÍ PARA CARGAR TU EXCEL</strong>
-        <input type="file" id="excelInput" accept=".xlsx, .xls" style="display:none" />
+    <div class="drop-zone" onclick="document.getElementById('excelFile').click()">
+        <strong>📥 CLIC AQUÍ PARA SUBIR EL EXCEL</strong>
+        <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:none">
     </div>
 
     <div class="btn-group">
-        <button class="btn-inf" onclick="generarInforme()">📊 VER RESULTADOS</button>
+        <button class="btn-inf" onclick="analizarDatos()">📊 GENERAR INFORME</button>
         <button class="btn-wa" onclick="enviarWhatsApp()">📱 ENVIAR A GERENCIA</button>
     </div>
 
-    <div id="panelInf" class="resumen-panel"></div>
+    <div id="resumen" class="info-panel" style="display:none"></div>
 
     <div style="overflow-x:auto;">
-        <table id="tablaArroz">
+        <table id="tablaVentas">
             <thead>
                 <tr>
                     <th>MES</th>
@@ -53,105 +53,110 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td colspan="7" style="color:#999; padding:30px;">Sube el archivo para procesar los datos.</td></tr>
+                <tr><td colspan="7">No hay datos cargados.</td></tr>
             </tbody>
         </table>
     </div>
 
     <div class="footer">
-        Desarrollado por <strong>Vibras Positivas HM</strong> &copy; 2026<br>
-        Derechos de Autor (3117700431) - Caucasia, Antioquia
+        Desarrollado por <strong>Vibras Positivas HM</strong> &copy; 2026 - Derechos de Autor (3117700431)
     </div>
 </div>
 
 <script>
-    let datosCargados = [];
+    let registros = [];
 
-    document.getElementById('excelInput').addEventListener('change', function(e) {
+    document.getElementById('excelFile').addEventListener('change', function(e) {
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
             const data = new Uint8Array(evt.target.result);
-            const wb = XLSX.read(data, {type: 'array'});
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+            const workbook = XLSX.read(data, {type: 'array'});
+            const hoja = workbook.Sheets[workbook.SheetNames[0]];
+            // Convertimos a matriz de datos para búsqueda manual
+            const filas = XLSX.utils.sheet_to_json(hoja, {header: 1, defval: ""});
             
-            if(json.length > 0) {
-                procesar(json);
-                alert("✅ ÉXITO: Se procesaron " + json.length + " filas correctamente.");
+            if (filas.length > 0) {
+                extraerInformacion(filas);
             }
         };
         reader.readAsArrayBuffer(e.target.files[0]);
     });
 
-    function procesar(filas) {
-        datosCargados = filas.map(f => {
-            const find = (keys) => {
-                const realKey = Object.keys(f).find(k => 
-                    keys.some(key => k.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(key))
-                );
-                return f[realKey];
-            };
+    function extraerInformacion(matriz) {
+        // Buscamos en qué fila están los títulos
+        let indiceTitulos = matriz.findIndex(fila => 
+            fila.some(celda => celda && celda.toString().toUpperCase().includes("PRODUCTO") || celda.toString().toUpperCase().includes("CANTIDAD"))
+        );
 
-            const c = parseFloat(find(['CANTIDAD', 'CANT'])) || 0;
-            const p = parseFloat(find(['PESO'])) || 0;
+        if (indiceTitulos === -1) indiceTitulos = 0; // Por defecto fila 0
 
+        const titulos = matriz[indiceTitulos].map(t => t.toString().toUpperCase().trim());
+        const datos = matriz.slice(indiceTitulos + 1);
+
+        const col = (nombre, filaActual) => {
+            const idx = titulos.findIndex(t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(nombre));
+            return idx !== -1 ? filaActual[idx] : "";
+        };
+
+        registros = datos.filter(f => f.length > 0 && col("PRODUCTO", f)).map(f => {
+            const c = parseFloat(col("CANTIDAD", f)) || 0;
+            const p = parseFloat(col("PESO", f)) || 0;
             return {
-                mes: find(['MES']) || '-',
-                prod: find(['PRODUCTO', 'NOMBRE', 'ARTICULO']) || '-',
+                mes: col("MES", f) || "-",
+                prod: col("PRODUCTO", f) || "-",
                 cant: c,
-                ciu: find(['CIUDAD', 'MUNICIPIO']) || '-',
+                ciu: col("CIUDAD", f) || "-",
                 peso: p,
                 kg: c * p,
-                vend: find(['VENDEDOR', 'VEND']) || 'N/A'
+                vend: col("VENDEDOR", f) || "N/A"
             };
         });
-        actualizarVista();
+
+        mostrarTabla();
+        alert("✅ Procesados " + registros.length + " registros de Vibras Positivas HM.");
     }
 
-    function actualizarVista() {
-        const body = document.querySelector("#tablaArroz tbody");
-        body.innerHTML = "";
-        datosCargados.forEach(v => {
-            body.innerHTML += `<tr>
-                <td>${v.mes}</td>
-                <td>${v.prod}</td>
-                <td>${v.cant}</td>
-                <td>${v.ciu}</td>
-                <td>${v.peso}</td>
-                <td><strong>${v.kg.toLocaleString()} Kg</strong></td>
-                <td>${v.vend}</td>
-            </tr>`;
-        });
+    function mostrarTabla() {
+        const body = document.querySelector("#tablaVentas tbody");
+        body.innerHTML = registros.map(r => `
+            <tr>
+                <td>${r.mes}</td>
+                <td>${r.prod}</td>
+                <td>${r.cant}</td>
+                <td>${r.ciu}</td>
+                <td>${r.peso}</td>
+                <td><strong>${r.kg.toLocaleString()} Kg</strong></td>
+                <td>${r.vend}</td>
+            </tr>
+        `).join('');
     }
 
-    function generarInforme() {
-        if(datosCargados.length === 0) return;
+    function analizarDatos() {
+        if (registros.length === 0) return alert("Sube el archivo primero.");
         
-        let vMap = {}, pMap = {}, cMap = {};
-        datosCargados.forEach(v => {
-            vMap[v.vend] = (vMap[v.vend] || 0) + v.kg;
-            pMap[v.prod] = (pMap[v.prod] || 0) + v.kg;
-            cMap[v.ciu] = (cMap[v.ciu] || 0) + v.kg;
+        let vends = {}, prods = {}, ciuds = {};
+        registros.forEach(r => {
+            vends[r.vend] = (vends[r.vend] || 0) + r.kg;
+            prods[r.prod] = (prods[r.prod] || 0) + r.kg;
+            ciuds[r.ciu] = (ciuds[r.ciu] || 0) + r.kg;
         });
 
-        const topV = Object.keys(vMap).reduce((a, b) => vMap[a] > vMap[b] ? a : b);
-        const topP = Object.keys(pMap).reduce((a, b) => pMap[a] > pMap[b] ? a : b);
-        const topC = Object.keys(cMap).reduce((a, b) => cMap[a] > cMap[b] ? a : b);
+        const top = (obj) => Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b);
 
-        const res = document.getElementById('panelInf');
-        res.style.display = "grid";
-        res.innerHTML = `
-            <div><strong>🏆 TOP VENDEDOR:</strong><br>${topV} (${vMap[topV].toLocaleString()} Kg)</div>
-            <div><strong>📦 PRODUCTO LÍDER:</strong><br>${topP}</div>
-            <div><strong>📍 CIUDAD PRINCIPAL:</strong><br>${topC}</div>
+        const panel = document.getElementById('resumen');
+        panel.style.display = "grid";
+        panel.innerHTML = `
+            <div><strong>🏆 VENDEDOR TOP:</strong><br>${top(vends)} (${vends[top(vends)].toLocaleString()} Kg)</div>
+            <div><strong>📦 PRODUCTO LÍDER:</strong><br>${top(prods)}</div>
+            <div><strong>📍 CIUDAD LÍDER:</strong><br>${top(ciuds)}</div>
         `;
     }
 
     function enviarWhatsApp() {
-        if(datosCargados.length === 0) return;
-        const totalKg = datosCargados.reduce((s, v) => s + v.kg, 0);
-        const txt = `VIBRAS POSITIVAS HM\nInforme de Ventas\nTotal: ${totalKg.toLocaleString()} Kg\nRegistros: ${datosCargados.length}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+        if (registros.length === 0) return;
+        const total = registros.reduce((s, r) => s + r.kg, 0);
+        const msg = encodeURIComponent(`REPORTE VIBRAS POSITIVAS HM:\nTotal Kilos: ${total.toLocaleString()} Kg\nRegistros: ${registros.length}`);
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 </script>
 
