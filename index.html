@@ -108,10 +108,10 @@
         </table>
     </div>
 
-    <div class="footer">
+    <footer class="footer">
         App desarrollada por <strong>Vibras Positivas HM</strong> &copy; 2026<br>
         Derechos de Autor Reservados - Cel: 3117700431
-    </div>
+    </footer>
 </div>
 
 <script>
@@ -229,7 +229,6 @@
         const total = filteredData.reduce((s, r) => s + r.kg, 0);
         const lider = document.getElementById('resLider').innerText;
         
-        // Construcción del reporte de productos
         let reporteProductos = "";
         Object.keys(prodTotals).sort().forEach(p => {
             reporteProductos += `- ${p}: ${prodTotals[p].toLocaleString()} Kg\n`;
@@ -242,7 +241,7 @@
                         `• Líder de Ventas: ${lider}\n\n` +
                         `*DETALLE POR PRODUCTO*\n` +
                         reporteProductos +
-                        `\n_Reporte generado automáticamente._`;
+                        `\nApp desarrollada por Vibras Positivas HM Derechos de Autor`;
 
         window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
     }
