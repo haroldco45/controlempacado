@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Vibras Positivas HM - Control de Arroz DEFINITIVO</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <title>Vibras Positivas HM - Control de Arroz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --verde: #2e7d32; --azul: #1565c0; --fondo: #f0f2f5; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fondo); margin: 0; padding: 20px; }
@@ -70,10 +70,15 @@
 <script>
     let misDatos = [];
 
-    // Función para leer el archivo
     document.getElementById('fileIn').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Verificar si la librería cargó
+        if (typeof XLSX === 'undefined') {
+            alert("❌ Error: La librería de Excel no cargó. Revisa tu conexión a internet.");
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = function(evt) {
@@ -85,9 +90,9 @@
                 
                 if(json.length > 0) {
                     limpiarDatos(json);
-                    alert("✅ ¡ÉXITO! Se cargaron " + json.length + " filas correctamente.");
+                    alert("✅ ¡ÉXITO! " + json.length + " filas cargadas.");
                 } else {
-                    alert("El archivo está vacío o los títulos no están en la primera fila.");
+                    alert("El archivo está vacío o los títulos no están en la fila 1.");
                 }
             } catch (err) {
                 alert("Error técnico: " + err.message);
@@ -98,7 +103,6 @@
 
     function limpiarDatos(filas) {
         misDatos = filas.map(f => {
-            // Función para encontrar columnas ignorando espacios ocultos y tildes
             const findCol = (alias) => {
                 const realKey = Object.keys(f).find(k => 
                     alias.some(a => k.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(a))
@@ -139,35 +143,28 @@
     }
 
     function hacerInforme() {
-        if(misDatos.length === 0) return alert("Primero debe subir el archivo Excel.");
-        
+        if(misDatos.length === 0) return alert("Sube el archivo primero.");
         let vMap = {}, pMap = {}, cMap = {};
         misDatos.forEach(v => {
             vMap[v.vend] = (vMap[v.vend] || 0) + v.kg;
             pMap[v.prod] = (pMap[v.prod] || 0) + v.kg;
             cMap[v.ciu] = (cMap[v.ciu] || 0) + v.kg;
         });
-
         const topV = Object.keys(vMap).reduce((a, b) => vMap[a] > vMap[b] ? a : b);
         const topP = Object.keys(pMap).reduce((a, b) => pMap[a] > pMap[b] ? a : b);
         const topC = Object.keys(cMap).reduce((a, b) => cMap[a] > cMap[b] ? a : b);
 
         const res = document.getElementById('boxInf');
         res.style.display = "block";
-        res.innerHTML = `
-            <strong>🏆 MEJOR VENDEDOR:</strong> ${topV} (${vMap[topV].toLocaleString()} Kg)<br>
-            <strong>📦 PRODUCTO LÍDER:</strong> ${topP}<br>
-            <strong>📍 CIUDAD PRINCIPAL:</strong> ${topC}
-        `;
+        res.innerHTML = `🏆 MEJOR VENDEDOR: ${topV} (${vMap[topV].toLocaleString()} Kg)<br>📦 PRODUCTO LÍDER: ${topP}<br>📍 CIUDAD PRINCIPAL: ${topC}`;
     }
 
     function enviarWA() {
         if(misDatos.length === 0) return;
         const total = misDatos.reduce((s, v) => s + v.kg, 0);
-        const texto = `VIBRAS POSITIVAS HM\nInforme de Arroz\nTotal Kilos: ${total.toLocaleString()} Kg\nRegistros: ${misDatos.length}`;
+        const texto = `VIBRAS POSITIVAS HM\nTotal: ${total.toLocaleString()} Kg`;
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 </script>
-
 </body>
 </html>
